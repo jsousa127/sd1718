@@ -22,7 +22,6 @@ public class ServerIn extends Thread {
                     String username, password;
                     username = in.readLine();
                     password = in.readLine();
-
                     try {
                         this.player = ow.logIn(username, password, m);
                         m.setMensagem("Logged In");
@@ -33,17 +32,30 @@ public class ServerIn extends Thread {
                     String user, pass;
                     user = in.readLine();
                     pass = in.readLine();
-
                     try {
-
-                        ow.signIn(user, pass,m);
-
+                        ow.signIn(user, pass, m);
                         m.setMensagem("Signed in");
                     } catch (Exception e) {
                         m.setMensagem(e.getMessage());
                     }
+                } else if (systemIn.equals("searchgame")) {
+                    try {
+                        ow.searchGame(player, m);
+                    } catch (Exception e) {
+                        m.setMensagem(e.getMessage());
+                    }
+                } else if (systemIn.equals("getrank")) {
+                    int n = ow.getRank(player);
+                    m.setMensagem("Rank:"+n);
                 }
+                else if (systemIn.startsWith("H")) {
+                    try {
+                        ow.setHero(player, systemIn,m);
+                    } catch (Exception e) {
+                        m.setMensagem(e.getMessage());
+                    }
 
+                }
             }
             in.close();
         } catch (Exception e) {

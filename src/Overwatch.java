@@ -12,10 +12,13 @@ import static java.lang.Boolean.TRUE;
 
 public class Overwatch {
     private Map<String,Player> players;
+    private Map<String,Integer> gamers;
     private Map<Integer,Game> games;
+    private int nGames;
     private Map<Integer,Queue> queues;
     private Map<String,Mensagem> mensagens;
     private Lock playersLock;
+    private Lock gamersLock;
     private Lock gamesLock;
     private Lock queuesLock;
     private Lock mensagensLock;
@@ -23,12 +26,15 @@ public class Overwatch {
     public Overwatch(){
         this.games = new HashMap<>();
         this.players = new HashMap<>();
+        this.gamers = new HashMap<>();
         this.queues = new HashMap<>();
         this.mensagens = new HashMap<>();
         this.playersLock = new ReentrantLock();
+        this.gamersLock = new ReentrantLock();
         this.gamesLock = new ReentrantLock();
-        this.mensagensLock = new Reen,[trantLock();
+        this.mensagensLock = new ReentrantLock();
         this.queuesLock = new ReentrantLock();
+        nGames=0;
     }
 
     public Player logIn(String username, String password,Mensagem m) throws Exception{
@@ -94,21 +100,44 @@ public class Overwatch {
     }
 
     public int searchGame(Player p,Mensagem m){
-        Game g = play(p);
-        if (g!=null) {
-            notifyPlayers(g,"GAME FOUND!!!");
-            selectHeroes(g);
+        int g = play(p);
+        if (g!=0) {
+            notifyPlayers(g,"GAME FOUND!!!",0);
+            HeroPhase hp = new HeroPhase(this,g);
+            hp.start();
+            return 1;
         }
         else m.setMensagem("Waiting on queue...");
         return 0;
     }
 
-    private void notifyPlayers(Game g,String s) {
+    public void notifyPlayers(int game,String s,int n) {
         Mensagem m=null;
-        int n=0;
+        List<Player> players=null;
+        gamesLock.lock();
+        Game g=null;
+        try{
+            g=games.get(game);
+        } finally {
+            gamesLock.unlock();
+        }
+        Lock gLock = g.getLock();
+        gLock.lock();
+        try {
+            switch (n) {
+                case 0:
+                    players = g.getPlayers();
+                case 1:
+                    players = g.getequipa1();
+                case 2:
+                    players = g.getequipa2();
+            }
+        } finally {
+            gLock.unlock();
+        }
         mensagensLock.lock();
         try{
-            for(Player p : g.getPlayers()) {
+            for(Player p : players) {
                 m = mensagens.get(p.getUsername());
                 m.setMensagem(s);
             }
@@ -117,106 +146,141 @@ public class Overwatch {
         }
     }
 
-    private boolean selectHeroes(Game g) {
-        long endTime = System.currentTimeMillis() + 30000;
-        Mensagem m=null;
-        while (System.currentTimeMillis() < endTime) {
-            for(Player p : g.getPlayers()) {
-                mensagensLock.lock();
-                try {
-                    m = mensagens.get(p);
-                }finally {
-                    mensagensLock.unlock();
-                }
-                if (m.getMensagem() != null)
-                    if(!g.addHero(p.getUsername(),m.getMensagem()))m.setMensagem("Your team has already chosen this hero.");
-            }
-        }
-        if (g.getHeroes().size()!=10) cancelGame(g);
-        else return TRUE;
-        return FALSE;
-    }
-
-    private void cancelGame(Game g) {
-        notifyPlayers(g,"GAME CANCELED");
-        gamesLock.lock();
+    public void cancelGame(int g) {
+        notifyPlayers(g,"GAME CANCELED",0);
+        gamersLock.lock();
         try{
-            games.remove(g.getId());
+            removeGamers(g);
         } finally {
             gamesLock.unlock();
         }
-        g=null;
+    }
+
+    private void removeGamers(int g) {
+        gamers.forEach((k,v)->{
+            if(v==g)gamers.remove(k);
+        });
     }
 
 
-    public Game play(Player p) {
-        int rank = p.getVitorias()/p.getJogos();
+    public int play(Player p) {
+        int rank = p.getVitorias()*10/p.getJogos();
         queuesLock.lock();
         try {
             Queue sameRank = queues.get(rank);
-            List<Queue> rankm = new ArrayList<>();
-            List<Queue> rankM = new ArrayList<>();
-            queues.forEach((k, v) -> {
-                if (k == rank - 1 && v.length() > 0) rankm.add(v);
-                if (k == rank + 1 && v.length() > 0) rankM.add(v);
-            });
+            Queue rankm = queues.get(rank-1);
+            Queue rankM = queues.get(rank+1);
             if (canPlay(sameRank, rankm)) return createGame(sameRank, rankm);
             else if (canPlay(sameRank, rankM)) return createGame(sameRank,rankM);
             else sameRank.addPlayer(p);
         } finally {queuesLock.unlock();}
-        return null;
+        return 0;
     }
 
-    private Boolean canPlay(Queue rank,List<Queue> list) {
+    private Boolean canPlay(Queue rank,Queue nearRank) {
         int n=0;
-        n=list.stream().map(q->q.length()).mapToInt(Integer::intValue).sum();
+        n=nearRank.length();
         n+=rank.length();
-        if(n>9)return TRUE;
-        return Boolean.FALSE;
+        if(n>1)return TRUE;
+        return FALSE;
     }
 
-    private Game createGame(Queue rank,List<Queue> nearRank) {
+    private int createGame(Queue rank,Queue nearRank) {
 
         List<Player> players = get10(rank,nearRank);
+        int id=0;
         Game game = new Game(players.subList(0,4),players.subList(5,9));
-        return game;
+        gamesLock.lock();
+        try{
+            nGames++;
+            id=nGames;
+            games.put(nGames,game);
+        } finally {
+            gamesLock.unlock();
+        }
+        players.forEach(p->gamers.put(p.getUsername(),nGames));
+        return id;
 
 
     }
 
-    private List<Player> get10(Queue rank,List<Queue> nearRank) {
+    private List<Player> get10(Queue rank,Queue nearRank) {
         List<Player> players = new ArrayList<>();
-        rank.getPlayers().forEach((k,v)->{players.add(v);rank.remove(v);});
+        Lock rankLock=rank.getLock();
+        Lock nearRankLock=nearRank.getLock();
+        rankLock.lock();
+        try {
+            rank.getPlayers().forEach((k, v) -> {
+                if (players.size() < 2) {
+                    players.add(v);
+                    rank.remove(v);
+                }
+            });
+        } finally {
+            rankLock.unlock();
+        }
         int n = players.size();
-        int x = 10-n;
+        int x = 2-n;
         n=0;
-        if(x==0);
-        if(nearRank.size()==1||x==1) {
-            while(n<x) {
-                Player p = nearRank.get(0).getPlayer(n);
+        nearRankLock.lock();
+        try {
+            while (n < x) {
+                Player p = nearRank.getPlayer(n);
                 players.add(p);
-                nearRank.get(0).remove(p);
+                nearRank.remove(p);
                 n++;
             }
+        } finally {
+            nearRankLock.unlock();
         }
-        else {
-            while(n<x){
-                Player p1 = nearRank.get(0).getPlayer(n);
-                Player p2 = nearRank.get(1).getPlayer(n);
-                players.add(p1);
-                nearRank.get(0).remove(p1);
-                if(n==x-2) break;
-                n++;
-                players.add(p2);
-                nearRank.get(1).remove(p2);
-                n++;
-            }
 
-        }
         return players;
     }
 
 
+    public boolean ready(int game) {
+        gamesLock.lock();
+        try{
+            if(games.get(game).getHeroes().size()==2) return TRUE;
+        } finally {
+            gamesLock.unlock();
+        }
+        return FALSE;
+    }
+
+    public int getRank(Player player) {
+        return player.getVitorias()*10/player.getJogos();
+
+    }
+
+    public void setHero(Player player, String hero, Mensagem m) {
+        int key;
+        String username=player.getUsername();
+        Game g;
+        gamersLock.lock();
+        try {
+            key=gamers.get(username);
+        } finally {
+            gamersLock.unlock();
+        }
+        gamesLock.lock();
+        try{
+            g=games.get(key);
+        } finally {
+            gamesLock.unlock();
+        }
+        Lock gLock = g.getLock();
+        gLock.lock();
+        try{
+            if(g.addHero(username,hero)) {
+                m.setMensagem("Hero Selected");
+                notifyPlayers(key,username+"picked"+hero,g.getTeam(player));
+            }
+            else m.setMensagem("Already picked by your team");
+        } finally {
+            gLock.unlock();
+        }
+    }
 }
 
 

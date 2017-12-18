@@ -9,10 +9,12 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 public class Game {
-	private int id;
+
 	private List<Player> equipa1;
 	private List<Player> equipa2;
 	private Map<String,String> heroes;
+
+
 
 	public Map<String, String> getHeroes() {
 		return heroes;
@@ -22,20 +24,10 @@ public class Game {
 		this.heroes = heroes;
 	}
 
-	public int getId() {
-		return id;
-
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	private int winner;
 	private Lock lock;
 
 	public Game(){
-			this.id = 0;
 			this.equipa1=new ArrayList<>();
 			this.equipa2=new ArrayList<>();
 			this.heroes =new HashMap<>();
@@ -99,6 +91,11 @@ public class Game {
 		return players;
 	}
 
+	public int getTeam(Player p){
+		if (equipa1.contains(p)) return 1;
+		else return 2;
+	}
+
 	public boolean addHero(String username, String h) {
 		if(equipa1.contains(username)) {
 			for (Player p : equipa1) {
@@ -106,7 +103,7 @@ public class Game {
 					if (heroes.get(p.getUsername()).equals(h)) return FALSE;
 			}
 		} else if(equipa2.contains(username)) {
-			for (Player p : equipa1) {
+			for (Player p : equipa2) {
 				if (heroes.containsKey(p.getUsername()))
 					if (heroes.get(p.getUsername()).equals(h)) return FALSE;
 			}

@@ -22,7 +22,7 @@ public class Client {
             clientOut.join();
             clientIn.join();
             in.close();
-            System.out.println("Até uma próxima!\n");
+            System.out.println("Goodbye\n");
             socket.close();
         } catch (Exception e) {
             System.out.println(e.getMessage());

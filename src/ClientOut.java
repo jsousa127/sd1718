@@ -67,6 +67,22 @@ public class ClientOut extends Thread {
                     }
                     else System.out.println("Opção inválida.");
                 }
+                else if(menu.getOption()==2) {
+                    if (systemIn.equals("1"))
+                        writer.println("searchgame");
+                    else if (systemIn.equals("2"))
+                        writer.println("getrank");
+                    else if(systemIn.equals("0"))
+                        break;
+                    if (systemIn.equals("1") || systemIn.equals("2") || systemIn.equals("m")){
+                        space();
+                        menu.setVisible();
+                    }
+
+                }
+                else if(menu.getOption()==3) {
+                    writer.println("H"+systemIn);
+                }
             }
             socket.shutdownOutput();
         }

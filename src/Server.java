@@ -16,6 +16,7 @@ public class Server {
         Socket sock;
         ReentrantLock lock = new ReentrantLock();
         Overwatch ow = new Overwatch();
+
         try{
             while ((sock=server.accept()) != null) {
                 Condition c = lock.newCondition();
