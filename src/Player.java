@@ -3,18 +3,21 @@ public class Player {
 
 	private String username;
 	private String password;
-	private int rank;
+	private int vitorias;
+	private int jogos;
 
 	public Player() {
 		username=null;
 		password=null;
-		rank=0;
+		vitorias=0;
+		jogos=0;
 	}
 
-	public Player(String username, String password, int rank) {
+	public Player(String username, String password, int vitorias, int jogos) {
 		this.username = username;
 		this.password = password;
-		this.rank = rank;
+		this.vitorias = vitorias;
+		this.jogos = jogos;
 	}
 
 	public String getUsername() {
@@ -25,8 +28,12 @@ public class Player {
 		return this.password;
 	}
 
-	public int getRank() {
-		return this.rank;
+	public int getVitorias() {
+		return this.vitorias;
+	}
+
+	public int getJogos() {
+		return this.jogos;
 	}
 
 	public void setUsername(String username) {
@@ -37,7 +44,10 @@ public class Player {
 		this.password = password;
 	}
 
-	public void setRank(String rank) {
-		this.rank = rank;
+	public void setVitorias(int vitorias) {
+		this.vitorias = vitorias;
 	}
+
+	public void setJogos(int jogos) {this.jogos = jogos;}
+
 }
