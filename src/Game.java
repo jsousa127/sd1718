@@ -1,49 +1,49 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Game {
 
-	private ArrayList<Player> horde;
-	private ArrayList<Player> alliance;
+	private List<Player> equipa1;
+	private List<Player> equipa2;
 	private int winner;
 	private Lock lock;
 
 	public Game(){
-			this.horde=new ArrayList<Player>();
-			this.alliance=new ArrayList<Player>();
+			this.equipa1=new ArrayList<>();
+			this.equipa2=new ArrayList<>();
 			this.winner=0;
 			this.lock=new ReentrantLock();
 			}
 
-	public Game(ArrayList<Player> horde,ArrayList<Player> alliance,Lock lock){
-			this.horde=horde;
-			this.alliance=alliance;
-			this.lock=lock;
+	public Game(List<Player> equipa1,List<Player> equipa2){
+			this.equipa1=equipa1;
+			this.equipa2=equipa2;
 			winner=0;
 			}
 
 	public Game(Game g){
-			horde=g.getHorde();
-			alliance=g.getAlliance();
+			equipa1=g.getequipa1();
+			equipa2=g.getequipa2();
 			winner=g.getWinner();
 			lock=g.getLock();
 			}
 
-	public ArrayList<Player> getHorde(){
-			return horde;
+	public List<Player> getequipa1(){
+			return equipa1;
 			}
 
-	public void setHorde(ArrayList<Player> horde){
-			this.horde=horde;
+	public void setequipa1(ArrayList<Player> equipa1){
+			this.equipa1=equipa1;
 			}
 
-	public ArrayList<Player> getAlliance(){
-			return alliance;
+	public List<Player> getequipa2(){
+			return equipa2;
 			}
 
-	public void setAlliance(ArrayList<Player> alliance){
-			this.alliance=alliance;
+	public void setequipa2(List<Player> equipa2){
+			this.equipa2=equipa2;
 			}
 
 	public void setLock(Lock lock) {
