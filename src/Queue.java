@@ -1,20 +1,21 @@
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 public class Queue {
 
-	private HashSet<Player> players;
+	private HashMap<String,Player> players;
 	private int rank;
 	private Lock lock;
 
 	public Queue() {
-		players = new HashSet<>();
+		players = new HashMap<>();
 		rank = 0;
 		lock = new ReentrantLock();
 	}
 
-	public Queue(HashSet<Player> players,int rank,Lock lock) {
+	public Queue(HashMap<String,Player> players,int rank,Lock lock) {
 		this.players = players;
 		this.rank = rank;
 		this.lock = lock;
@@ -26,9 +27,13 @@ public class Queue {
 		lock = q.getLock();
 	}
 
-	public HashSet<Player> getPlayers() {
+	public HashMap<String,Player> getPlayers() {
 		return players;
 	}
+
+	public Player getPlayer(int index) {
+	    return players.entrySet().stream().collect(Collectors.toList()).get(index).getValue();
+    }
 
 	public int getRank() {
 		return rank;
@@ -42,7 +47,7 @@ public class Queue {
 		this.lock = lock;
 	}
 
-	public void setPlayers(HashSet<Player> players) {
+	public void setPlayers(HashMap<String,Player> players) {
 		this.players = players;
 	}
 
@@ -50,4 +55,15 @@ public class Queue {
 		this.rank = rank;
 	}
 
+	public int length() {
+	    return players.size();
+    }
+
+    public void addPlayer(Player p) {
+	    players.put(p.getUsername(),p);
+    }
+
+    public void remove(Player v) {
+	    players.remove(v.getUsername());
+    }
 }
