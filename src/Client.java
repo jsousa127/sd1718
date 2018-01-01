@@ -13,14 +13,14 @@ public class Client {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             Menu menu = new Menu();
             menu.setOption(1);
-            Lock lock = new ReentrantLock();
+            ReentrantLock lock = new ReentrantLock();
             Condition c = lock.newCondition();
-            ClientIn clientIn = new ClientIn(in, menu, lock, c);
             ClientOut clientOut = new ClientOut(socket, menu, lock, c);
-            clientIn.start();
+            ClientIn clientIn = new ClientIn(in, menu, lock, c);
             clientOut.start();
-            clientIn.join();
+            clientIn.start();
             clientOut.join();
+            clientIn.join();
             in.close();
             System.out.println("Até uma próxima!\n");
             socket.close();

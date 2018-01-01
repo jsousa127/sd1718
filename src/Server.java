@@ -14,7 +14,7 @@ public class Server {
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(1234);
         Socket sock;
-        Lock lock = new ReentrantLock();
+        ReentrantLock lock = new ReentrantLock();
         Overwatch ow = new Overwatch();
         try{
             while ((sock=server.accept()) != null) {

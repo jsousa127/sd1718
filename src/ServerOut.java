@@ -1,12 +1,13 @@
 import java.io.PrintWriter;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerOut extends Thread{
 
     private final PrintWriter out;
     private Mensagem  m;
-    private Lock lock;
+    private ReentrantLock lock;
     private Condition c;
 
     public ServerOut(Mensagem m,PrintWriter out) {

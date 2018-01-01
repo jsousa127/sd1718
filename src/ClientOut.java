@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientOut extends Thread {
 
@@ -12,11 +13,11 @@ public class ClientOut extends Thread {
     private PrintWriter writer;
     private Socket socket;
     private Menu menu;
-    private Lock lock;
+    private ReentrantLock lock;
     private Condition c;
 
 
-    public ClientOut(Socket socket,Menu menu, Lock lock, Condition c) {
+    public ClientOut(Socket socket, Menu menu, ReentrantLock lock, Condition c) {
         try {
             this.socket = socket;
             this.menu = menu;
@@ -60,7 +61,7 @@ public class ClientOut extends Thread {
                         writer.println(systemIn);
                         systemIn = "2";
                     }
-                    if(systemIn.equals("1") || systemIn.equals("2") || systemIn.equals("3") || systemIn.equals("0") || systemIn.equals("m")){
+                    if(systemIn.equals("1") || systemIn.equals("2") || systemIn.equals("3") || systemIn.equals("m")){
                         space();
                         menu.setVisible();
                     }

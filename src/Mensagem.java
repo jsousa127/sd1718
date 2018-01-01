@@ -1,15 +1,15 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Mensagem {
     private List<String> mensagem;
     private int i;
-    private Lock lock;
+    private ReentrantLock lock;
     private Condition c;
 
-    public Mensagem(Lock lock,Condition c){
+    public Mensagem(ReentrantLock lock,Condition c){
         this.mensagem = new ArrayList<>();
         this.i=0;
         this.lock = lock;
@@ -39,7 +39,7 @@ public class Mensagem {
         }
     }
 
-    public Lock getLock() {
+    public ReentrantLock getLock() {
         return this.lock;
     }
 

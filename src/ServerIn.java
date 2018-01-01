@@ -35,7 +35,9 @@ public class ServerIn extends Thread {
                     pass = in.readLine();
 
                     try {
+
                         ow.signIn(user, pass,m);
+
                         m.setMensagem("Signed in");
                     } catch (Exception e) {
                         m.setMensagem(e.getMessage());
