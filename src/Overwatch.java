@@ -21,7 +21,7 @@ public class Overwatch {
     private Lock queuesLock;
     private Lock messagesLock;
     private int nGames;
-    private final int nPlayers=4; // Team length;
+    private final int nPlayers=10; // Players needed for a game;
 
     public Overwatch(){
         this.games = new HashMap<>();
