@@ -14,8 +14,8 @@ public class HeroPhase extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        String message;
-        if(ow.ready(game)) ow.notifyPlayers(game,"Game started",0);
+        if(ow.ready(game))
+            ow.setWinner(game);
         else ow.cancelGame(game);
 
     }

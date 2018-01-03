@@ -1,25 +1,21 @@
-
 public class Menu {
 
-    private String menu;
     private int option;
 
     public void setVisible() {
         switch (option) {
             case 1:
                 System.out.println("************* MENU ****************\n" +
-                        "* 1 - Iniciar Sessao              *\n" +
-                        "* 2 - Registar                    *\n" +
-                        "* m - Mostrar o Menu              *\n" +
-                        "* 0 - Sair                        *\n" +
+                        "* 1 - Log In                      *\n" +
+                        "* 2 - Sign In                     *\n" +
+                        "* 0 - Exit                        *\n" +
                         "***********************************\n");
                 break;
 
             case 2: System.out.println("************* MENU ****************\n"+
-                    "* 1 - Procurar Jogo               *\n"+
-                    "* 2 - Consultar Rank              *\n"+
-                    "* m - Mostrar o Menu              *\n"+
-                    "* 0 - Terminar Sessao             *\n"+
+                    "* 1 - Search Game                 *\n"+
+                    "* 2 - Check Rank                  *\n"+
+                    "* 0 - Exit                        *\n"+
                     "***********************************\n");
                 break;
 

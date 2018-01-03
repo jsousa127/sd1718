@@ -16,7 +16,6 @@ public class ClientOut extends Thread {
     private ReentrantLock lock;
     private Condition c;
 
-
     public ClientOut(Socket socket, Menu menu, ReentrantLock lock, Condition c) {
         try {
             this.socket = socket;
@@ -45,27 +44,27 @@ public class ClientOut extends Thread {
                         System.out.print("Password:");
                         systemIn = in.readLine();
                         writer.println(systemIn);
-
                         this.lock.lock();
                         c.await();
                         this.lock.unlock();
-                        systemIn = "1";
+                        systemIn="1";
                     } else if (systemIn.equals("2")) {
                         writer.println("signin");
                         System.out.print("Username: ");
                         systemIn = in.readLine();
                         writer.println(systemIn);
-
                         System.out.print("Password: ");
                         systemIn = in.readLine();
                         writer.println(systemIn);
-                        systemIn = "2";
+                        this.lock.lock();
+                        c.await();
+                        this.lock.unlock();
+                        systemIn="2";
                     }
-                    if(systemIn.equals("1") || systemIn.equals("2") || systemIn.equals("3") || systemIn.equals("m")){
-                        space();
+                    if(systemIn.equals("1")||systemIn.equals("2") || systemIn.equals("3") || systemIn.equals("m")){
+                        System.out.println("\n\n\n\n\n");
                         menu.setVisible();
                     }
-                    else System.out.println("Opção inválida.");
                 }
                 else if(menu.getOption()==2) {
                     if (systemIn.equals("1"))
@@ -74,8 +73,8 @@ public class ClientOut extends Thread {
                         writer.println("getrank");
                     else if(systemIn.equals("0"))
                         break;
-                    if (systemIn.equals("1") || systemIn.equals("2") || systemIn.equals("m")){
-                        space();
+                    if (systemIn.equals("2") || systemIn.equals("m")){
+                        System.out.println("\n\n\n\n\n");
                         menu.setVisible();
                     }
 
@@ -92,10 +91,5 @@ public class ClientOut extends Thread {
 
 
 
-    }
-
-    private void space(){
-        for(int i = 0;i<40;i++)
-            System.out.println();
     }
 }

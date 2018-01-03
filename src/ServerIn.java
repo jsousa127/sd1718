@@ -3,11 +3,11 @@ import java.io.IOException;
 
 public class ServerIn extends Thread {
     private Player player;
-    private Mensagem m;
+    private Message m;
     private BufferedReader in;
     private Overwatch ow;
 
-    public ServerIn(Mensagem m, BufferedReader in, Overwatch ow) throws IOException {
+    public ServerIn(Message m, BufferedReader in, Overwatch ow) throws IOException {
         this.m = m;
         this.in = in;
         this.ow = ow;
@@ -24,35 +24,35 @@ public class ServerIn extends Thread {
                     password = in.readLine();
                     try {
                         this.player = ow.logIn(username, password, m);
-                        m.setMensagem("Logged In");
+                        m.setMessage("Logged In");
                     } catch (Exception e) {
-                        m.setMensagem(e.getMessage());
+                        m.setMessage(e.getMessage());
                     }
                 } else if (systemIn.equals("signin")) {
                     String user, pass;
                     user = in.readLine();
                     pass = in.readLine();
                     try {
-                        ow.signIn(user, pass, m);
-                        m.setMensagem("Signed in");
+                        this.player=ow.signIn(user, pass, m);
+                        m.setMessage("Signed in");
                     } catch (Exception e) {
-                        m.setMensagem(e.getMessage());
+                        m.setMessage(e.getMessage());
                     }
                 } else if (systemIn.equals("searchgame")) {
                     try {
                         ow.searchGame(player, m);
                     } catch (Exception e) {
-                        m.setMensagem(e.getMessage());
+                        m.setMessage(e.getMessage());
                     }
                 } else if (systemIn.equals("getrank")) {
                     int n = ow.getRank(player);
-                    m.setMensagem("Rank:"+n);
+                    m.setMessage("Rank:"+n);
                 }
                 else if (systemIn.startsWith("H")) {
                     try {
                         ow.setHero(player, systemIn,m);
                     } catch (Exception e) {
-                        m.setMensagem(e.getMessage());
+                        m.setMessage(e.getMessage());
                     }
 
                 }

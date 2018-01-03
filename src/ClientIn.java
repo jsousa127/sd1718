@@ -5,7 +5,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientIn extends Thread {
 
-
     private BufferedReader in;
     private Menu menu;
     private ReentrantLock lock;
@@ -22,18 +21,26 @@ public class ClientIn extends Thread {
         try {
             String serverIn;
             while ((serverIn = in.readLine()) != null) {
-                if (serverIn.equals("Logged In")) {
+
+                if (serverIn.equals("Logged In") || serverIn.equals("Signed in")) {
                     menu.setOption(2);
                     this.lock.lock();
                     c.signal();
                     this.lock.unlock();
-                } else if (serverIn.equals("Logged Out") || serverIn.equals("Not an account") || serverIn.equals("Wrong password")) {
+                } else if (serverIn.equals("Logged Out") || serverIn.equals("Not an account") || serverIn.equals("Wrong password") || serverIn.equals("Username in use")) {
                     menu.setOption(1);
                     this.lock.lock();
                     c.signal();
                     this.lock.unlock();
                 }   else if (serverIn.equals("GAME FOUND!!!")) {
                     menu.setOption(3);
+                    menu.setVisible();
+                    this.lock.lock();
+                    c.signal();
+                    this.lock.unlock();
+                }   else if (serverIn.equals("Game started") || serverIn.equals("GAME CANCELED")) {
+                    menu.setOption(2);
+                    menu.setVisible();
                     this.lock.lock();
                     c.signal();
                     this.lock.unlock();

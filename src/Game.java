@@ -4,117 +4,95 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 public class Game {
 
-	private List<Player> equipa1;
-	private List<Player> equipa2;
+	private List<Player> team1;
+	private List<Player> team2;
 	private Map<String,String> heroes;
+	private Lock lock;
 
-
+	public Game(List<Player> team1,List<Player> team2){
+			this.team1=team1;
+			this.team2=team2;
+			this.heroes =new HashMap<>();
+			this.lock=new ReentrantLock();
+			}
 
 	public Map<String, String> getHeroes() {
 		return heroes;
 	}
 
-	public void setHeroes(Map<String, String> heroes) {
-		this.heroes = heroes;
-	}
-
-	private int winner;
-	private Lock lock;
-
-	public Game(){
-			this.equipa1=new ArrayList<>();
-			this.equipa2=new ArrayList<>();
-			this.heroes =new HashMap<>();
-			this.winner=0;
-			this.lock=new ReentrantLock();
-			}
-
-	public Game(List<Player> equipa1,List<Player> equipa2){
-			this.equipa1=equipa1;
-			this.equipa2=equipa2;
-			this.heroes =new HashMap<>();
-			this.winner=0;
-			this.lock=new ReentrantLock();
-			}
-
-	public Game(Game g){
-			equipa1=g.getequipa1();
-			equipa2=g.getequipa2();
-			winner=g.getWinner();
-			lock=g.getLock();
-			heroes=g.getHeroes();
-			}
-
-	public List<Player> getequipa1(){
-			return equipa1;
-			}
-
-	public void setequipa1(ArrayList<Player> equipa1){
-			this.equipa1=equipa1;
-			}
-
-	public List<Player> getequipa2(){
-			return equipa2;
-			}
-
-	public void setequipa2(List<Player> equipa2){
-			this.equipa2=equipa2;
-			}
-
-	public void setLock(Lock lock) {
-			this.lock = lock;
-		}
-
-	public int getWinner(){
-			return winner;
-
-			}
-
-	public void setWinner(int winner){
-			this.winner=winner;
-			}
-
 	public Lock getLock(){
-			return lock;
-			}
+		return lock;
+	}
 
 	public List<Player> getPlayers() {
 		List<Player> players = new ArrayList<>();
-		players.addAll(equipa1);
-		players.addAll(equipa2);
+		players.addAll(team1);
+		players.addAll(team2);
 		return players;
 	}
 
 	public int getTeam(Player p){
-		if (equipa1.contains(p)) return 1;
+		if (team1.contains(p)) return 1;
 		else return 2;
 	}
 
-	public boolean addHero(String username, String h) {
-		if(equipa1.contains(username)) {
-			for (Player p : equipa1) {
-				if (heroes.containsKey(p.getUsername()))
-					if (heroes.get(p.getUsername()).equals(h)) return FALSE;
-			}
-		} else if(equipa2.contains(username)) {
-			for (Player p : equipa2) {
-				if (heroes.containsKey(p.getUsername()))
-					if (heroes.get(p.getUsername()).equals(h)) return FALSE;
-			}
+	public void setWinner(int winner){
+		List<Player> w,l;
+		if(winner==1){
+			w=team1;
+			l=team2;
 		}
-		lock.lock();
+		else {
+			w=team2;
+			l=team1;
+		}
+		for(Player p: w)
+			p.addWin();
+		for(Player p: l){
+			p.addLoss();
+		}
 
+	}
+
+	public List<Player> getTeamMembers(int team){
+		if(team==1) return team1;
+		else return team2;
+	}
+
+	public boolean addHero(String username, String h) {
+		if(heroes.containsValue(h)){
+			List<String> players = heroes.entrySet().stream().filter(e->e.getValue().equals(h)).map(e->e.getKey()).collect(Collectors.toList());
+			if(players.size()>1) return FALSE;
+			else if (sameTeam(players.get(0),username)) return FALSE;
+		}
+
+		lock.lock();
 		try {
 			heroes.put(username, h);
 		} finally {
 			lock.unlock();
 		}
 		return TRUE;
+	}
+
+	private boolean sameTeam(String player1, String player2) {
+		int n=0;
+		for(Player p:team1){
+			if (p.getUsername().equals(player1))n++;
+			else if (p.getUsername().equals(player2))n++;
+		}
+		for(Player p:team1){
+			if (p.getUsername().equals(player1))n++;
+			else if (p.getUsername().equals(player2))n++;
+		}
+		if (n>1) return FALSE;
+		else return TRUE;
 	}
 }

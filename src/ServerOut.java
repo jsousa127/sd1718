@@ -1,16 +1,15 @@
 import java.io.PrintWriter;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerOut extends Thread{
 
     private final PrintWriter out;
-    private Mensagem  m;
+    private Message m;
     private ReentrantLock lock;
     private Condition c;
 
-    public ServerOut(Mensagem m,PrintWriter out) {
+    public ServerOut(Message m, PrintWriter out) {
         this.m = m;
         this.out = out;
         this.c = m.getCondition();
@@ -22,7 +21,7 @@ public class ServerOut extends Thread{
         try{
             String linha;
             while(true){
-                while((linha = m.getMensagem())==null) c.await();
+                while((linha = m.getMessage())==null) c.await();
                 this.out.println(linha);
             }
         }
@@ -33,6 +32,5 @@ public class ServerOut extends Thread{
             this.lock.unlock();
         }
     }
-
 
 }
